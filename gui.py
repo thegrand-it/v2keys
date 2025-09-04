@@ -13,11 +13,11 @@ class VPNGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("VPN Client - v2keys")
-        self.root.geometry("700x500")
+        self.root.geometry("800x600")
         self.root.resizable(True, True)
-        self.root.configure(bg="#F5F5F5")
+        self.root.configure(bg="#2b2b2b")  # Modern dark background
 
-        # Style - Blue and White Theme
+        # Style - Modern Dark Theme
         style = ttk.Style()
 
         # Try to use a modern theme if available
@@ -26,62 +26,65 @@ class VPNGUI:
         except:
             pass
 
-        # Button styling with better colors
+        # Button styling with modern colors
         style.configure("TButton",
-                       padding=8,
-                       relief="raised",
-                       background="#2196F3",
-                       foreground="white",
-                       font=("Arial", 10, "bold"),
-                       borderwidth=1)
+                        padding=10,
+                        relief="flat",
+                        background="#4CAF50",
+                        foreground="white",
+                        font=("Segoe UI", 10, "bold"),
+                        borderwidth=0)
         style.map("TButton",
-                 background=[("active", "#1976D2"),
-                           ("pressed", "#0D47A1"),
-                           ("disabled", "#BDBDBD")],
-                 foreground=[("disabled", "#757575")],
-                 relief=[("pressed", "sunken"), ("!pressed", "raised")])
+                  background=[("active", "#45a049"),
+                            ("pressed", "#3d8b40"),
+                            ("disabled", "#cccccc")],
+                  foreground=[("disabled", "#999999")],
+                  relief=[("pressed", "sunken"), ("!pressed", "flat")])
 
         # Label styling
-        style.configure("TLabel", font=("Arial", 10), background="#F5F5F5", foreground="#212121")
+        style.configure("TLabel", font=("Segoe UI", 10), background="#2b2b2b", foreground="#e0e0e0")
 
         # Checkbutton styling
-        style.configure("TCheckbutton", font=("Arial", 10), background="#F5F5F5", foreground="#212121")
+        style.configure("TCheckbutton", font=("Segoe UI", 10), background="#2b2b2b", foreground="#e0e0e0")
 
         # Frame styling
-        style.configure("TFrame", background="#F5F5F5")
-        style.configure("TLabelframe", background="#F5F5F5", foreground="#1976D2", font=("Arial", 11, "bold"))
-        style.configure("TLabelframe.Label", background="#F5F5F5", foreground="#1976D2", font=("Arial", 11, "bold"))
+        style.configure("TFrame", background="#2b2b2b")
+        style.configure("TLabelframe", background="#363636", foreground="#2196F3", font=("Segoe UI", 12, "bold"))
+        style.configure("TLabelframe.Label", background="#363636", foreground="#2196F3", font=("Segoe UI", 12, "bold"))
+
+        # Listbox styling
+        style.configure("TListbox", background="#363636", foreground="#e0e0e0", font=("Segoe UI", 9))
 
         # Main container
-        main_frame = ttk.Frame(root, padding="20")
+        main_frame = ttk.Frame(root, padding="30")
         main_frame.pack(fill="both", expand=True)
 
         # Title
-        title_label = ttk.Label(main_frame, text="VPN Client", font=("Arial", 16, "bold"), foreground="#1976D2")
-        title_label.pack(pady=(0, 20))
+        title_label = ttk.Label(main_frame, text="🚀 VPN Client - v2keys", font=("Segoe UI", 20, "bold"), foreground="#4CAF50")
+        title_label.pack(pady=(0, 30))
 
         # Subscription frame
-        sub_frame = ttk.LabelFrame(main_frame, text="Subscription", padding="10")
-        sub_frame.pack(fill="x", pady=(0, 15))
+        sub_frame = ttk.LabelFrame(main_frame, text="📡 Subscription Management", padding="15")
+        sub_frame.pack(fill="x", pady=(0, 20))
 
-        ttk.Label(sub_frame, text="Default subscription loaded automatically").pack(anchor="w", pady=5)
+        ttk.Label(sub_frame, text="🔗 Default subscription loaded automatically", font=("Segoe UI", 9)).pack(anchor="w", pady=(0, 10))
         self.reload_button = tk.Button(sub_frame, text="🔄 Reload Subscription", command=self.load_subscription,
-                                      bg="#107C10", fg="white", font=("Arial", 9, "bold"),
-                                      relief="raised", bd=2, padx=10, pady=5,
-                                      activebackground="#0B5A0B", activeforeground="white")
-        self.reload_button.pack(anchor="w", pady=(5, 0))
+                                      bg="#2196F3", fg="white", font=("Segoe UI", 10, "bold"),
+                                      relief="flat", bd=0, padx=15, pady=8,
+                                      activebackground="#1976D2", activeforeground="white")
+        self.reload_button.pack(anchor="w", pady=(0, 0))
 
         # Server selection frame
-        server_frame = ttk.LabelFrame(main_frame, text="Server Selection", padding="10")
-        server_frame.pack(fill="both", expand=True, pady=(0, 15))
+        server_frame = ttk.LabelFrame(main_frame, text="🌐 Server Selection", padding="15")
+        server_frame.pack(fill="both", expand=True, pady=(0, 20))
 
-        ttk.Label(server_frame, text="Available Servers:").pack(anchor="w", pady=(0, 5))
+        ttk.Label(server_frame, text="📋 Available Servers:", font=("Segoe UI", 11)).pack(anchor="w", pady=(0, 10))
 
         # Listbox with scrollbar
         listbox_frame = ttk.Frame(server_frame)
         listbox_frame.pack(fill="both", expand=True)
 
-        self.server_listbox = tk.Listbox(listbox_frame, height=8, font=("Arial", 9), selectbackground="#2196F3", selectforeground="white", bg="white", fg="#212121")
+        self.server_listbox = tk.Listbox(listbox_frame, height=10, font=("Segoe UI", 9), selectbackground="#2196F3", selectforeground="white", bg="#363636", fg="#e0e0e0", relief="flat", bd=0)
         scrollbar = ttk.Scrollbar(listbox_frame, orient="vertical", command=self.server_listbox.yview)
         self.server_listbox.configure(yscrollcommand=scrollbar.set)
 
@@ -90,29 +93,29 @@ class VPNGUI:
 
         # Control frame
         control_frame = ttk.Frame(server_frame)
-        control_frame.pack(fill="x", pady=(10, 0))
+        control_frame.pack(fill="x", pady=(15, 0))
 
         self.connect_button = tk.Button(control_frame, text="🔗 Connect", command=self.connect_vpn,
-                                       bg="#0078D4", fg="white", font=("Arial", 10, "bold"),
-                                       relief="raised", bd=2, padx=15, pady=8,
-                                       activebackground="#106EBE", activeforeground="white")
-        self.connect_button.pack(side="left", padx=(0, 10))
+                                       bg="#4CAF50", fg="white", font=("Segoe UI", 11, "bold"),
+                                       relief="flat", bd=0, padx=20, pady=10,
+                                       activebackground="#45a049", activeforeground="white")
+        self.connect_button.pack(side="left", padx=(0, 15))
 
         self.disconnect_button = tk.Button(control_frame, text="❌ Disconnect", command=self.disconnect_vpn, state="disabled",
-                                          bg="#D13438", fg="white", font=("Arial", 10, "bold"),
-                                          relief="raised", bd=2, padx=15, pady=8,
-                                          activebackground="#C42B30", activeforeground="white")
-        self.disconnect_button.pack(side="left", padx=(0, 20))
+                                          bg="#f44336", fg="#ffffff", font=("Segoe UI", 11, "bold"),
+                                          relief="flat", bd=0, padx=20, pady=10,
+                                          activebackground="#d32f2f", activeforeground="#ffffff")
+        self.disconnect_button.pack(side="left", padx=(0, 30))
 
         self.system_proxy_var = tk.BooleanVar()
-        self.system_proxy_check = ttk.Checkbutton(control_frame, text="Auto-set System Proxy", variable=self.system_proxy_var)
+        self.system_proxy_check = ttk.Checkbutton(control_frame, text="🔧 Auto-set System Proxy", variable=self.system_proxy_var, command=self.update_system_proxy)
         self.system_proxy_check.pack(side="left")
 
         # Status frame
         status_frame = ttk.Frame(main_frame)
-        status_frame.pack(fill="x", pady=(10, 0))
+        status_frame.pack(fill="x", pady=(20, 0))
 
-        self.status_label = ttk.Label(status_frame, text="Status: Ready", font=("Arial", 9, "italic"), foreground="#1976D2")
+        self.status_label = ttk.Label(status_frame, text="📊 Status: Ready", font=("Segoe UI", 10, "italic"), foreground="#4CAF50")
         self.status_label.pack(anchor="w")
 
         # Store configs
@@ -147,20 +150,20 @@ class VPNGUI:
             for i, config in enumerate(configs):
                 name = config.get('name', f"{config['protocol'].upper()}-{config['host']}:{config['port']}")
                 self.server_listbox.insert(tk.END, f"{i+1}. {name}")
-            self.status_label.config(text=f"Status: Loaded {len(configs)} servers")
+            self.status_label.config(text=f"📊 Status: Loaded {len(configs)} servers", foreground="#4CAF50")
 
         except Exception as e:
-            self.status_label.config(text="Status: Failed to load subscription")
-            messagebox.showerror("Error", f"Failed to fetch or parse: {str(e)}")
+            self.status_label.config(text="❌ Status: Failed to load subscription", foreground="#f44336")
+            messagebox.showerror("❌ Error", f"Failed to fetch or parse: {str(e)}")
 
     def load_subscription(self):
         sub_url = "https://raw.githubusercontent.com/thegrand-it/v2keys/refs/heads/main/ss.txt"
-        self.status_label.config(text="Status: Loading subscription...")
+        self.status_label.config(text="⏳ Status: Loading subscription...", foreground="#ff9800")
         self.fetch_and_parse_url(sub_url)
 
     def export_config(self):
         if not self.current_configs:
-            messagebox.showerror("Error", "No configs to export")
+            messagebox.showerror("❌ Error", "No configs to export")
             return
 
         configs = self.current_configs
@@ -293,16 +296,16 @@ class VPNGUI:
         if file_path:
             with open(file_path, 'w') as f:
                 json.dump(v2ray_config, f, indent=2)
-            messagebox.showinfo("Success", f"Config exported to {file_path}\n\nTo connect, import this file into v2rayN or similar client.")
+            messagebox.showinfo("✅ Success", f"📁 Config exported to {file_path}\n\n🔗 To connect, import this file into v2rayN or similar client.")
 
     def connect_vpn(self):
         if not self.current_configs:
-            messagebox.showerror("Error", "No configs available")
+            messagebox.showerror("❌ Error", "No configs available")
             return
 
         selection = self.server_listbox.curselection()
         if not selection:
-            messagebox.showerror("Error", "Please select a server")
+            messagebox.showerror("❌ Error", "Please select a server")
             return
 
         selected_index = selection[0]
@@ -404,7 +407,7 @@ class VPNGUI:
                 "tag": selected_config.get('name', f"vless-{selected_config['host']}")
             }
         else:
-            messagebox.showerror("Error", "Unsupported protocol")
+            messagebox.showerror("❌ Error", "Unsupported protocol")
             return
 
         v2ray_config["outbounds"].append(outbound)
@@ -445,14 +448,13 @@ class VPNGUI:
                 self.v2ray_process = subprocess.Popen([v2ray_path, "-config", config_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 self.connect_button.config(state="disabled")
                 self.disconnect_button.config(state="normal")
-                self.status_label.config(text="Status: Connected - VPN active")
-                if self.system_proxy_var.get():
-                    self.set_system_proxy()
-                messagebox.showinfo("Connected", "VPN connected successfully!\nHTTP proxy: 127.0.0.1:8080")
+                self.status_label.config(text="✅ Status: Connected - VPN active", foreground="#4CAF50")
+                self.update_system_proxy()
+                messagebox.showinfo("🎉 Connected", "VPN connected successfully!\n🌐 HTTP proxy: 127.0.0.1:8080")
             except FileNotFoundError:
-                messagebox.showerror("Error", "v2ray.exe not found. Please ensure v2ray folder is in the script directory or v2ray is in PATH.")
+                messagebox.showerror("❌ Error", "v2ray.exe not found. Please ensure v2ray folder is in the script directory or v2ray is in PATH.")
             except Exception as e:
-                messagebox.showerror("Error", f"Failed to start VPN: {str(e)}")
+                messagebox.showerror("❌ Error", f"Failed to start VPN: {str(e)}")
 
         threading.Thread(target=run_v2ray).start()
 
@@ -462,10 +464,9 @@ class VPNGUI:
             self.v2ray_process = None
             self.connect_button.config(state="normal")
             self.disconnect_button.config(state="disabled")
-            self.status_label.config(text="Status: Disconnected")
-            if self.system_proxy_var.get():
-                self.unset_system_proxy()
-            messagebox.showinfo("Disconnected", "VPN disconnected successfully.")
+            self.status_label.config(text="🔌 Status: Disconnected", foreground="#9e9e9e")
+            self.update_system_proxy()
+            messagebox.showinfo("🔌 Disconnected", "VPN disconnected successfully.")
 
     def set_system_proxy(self):
         try:
@@ -482,7 +483,7 @@ class VPNGUI:
             ctypes.windll.wininet.InternetSetOptionW(0, INTERNET_OPTION_REFRESH, 0, 0)
             ctypes.windll.wininet.InternetSetOptionW(0, INTERNET_OPTION_SETTINGS_CHANGED, 0, 0)
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to set system proxy: {str(e)}")
+            messagebox.showerror("❌ Error", f"Failed to set system proxy: {str(e)}")
 
     def unset_system_proxy(self):
         try:
@@ -497,4 +498,10 @@ class VPNGUI:
             ctypes.windll.wininet.InternetSetOptionW(0, INTERNET_OPTION_REFRESH, 0, 0)
             ctypes.windll.wininet.InternetSetOptionW(0, INTERNET_OPTION_SETTINGS_CHANGED, 0, 0)
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to unset system proxy: {str(e)}")
+            messagebox.showerror("❌ Error", f"Failed to unset system proxy: {str(e)}")
+
+    def update_system_proxy(self):
+        if self.system_proxy_var.get():
+            self.set_system_proxy()
+        else:
+            self.unset_system_proxy()
