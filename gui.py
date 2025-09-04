@@ -135,6 +135,9 @@ class VPNGUI:
         # Auto-load subscription on startup
         self.root.after(100, self.load_subscription)
 
+        # Handle application exit
+        self.root.protocol("WM_DELETE_WINDOW", self.on_app_exit)
+
     def setup_styles(self):
         """Configure ttk styles for modern look"""
         style = ttk.Style()
@@ -892,6 +895,25 @@ class VPNGUI:
             self.root.after(2000, lambda: self.status_details.config(text="Ready to connect"
                                                                     if not self.v2ray_process
                                                                     else "Connected"))
+
+    def on_app_exit(self):
+        """Handle application exit - ensure proxy is removed and processes are terminated"""
+        try:
+            # Terminate V2Ray process if running
+            if self.v2ray_process:
+                self.v2ray_process.terminate()
+                self.v2ray_process.wait(timeout=5)  # Wait up to 5 seconds
+                self.v2ray_process = None
+
+            # Always unset system proxy on exit
+            self.unset_system_proxy()
+
+        except Exception as e:
+            # Log error but don't prevent exit
+            print(f"Error during cleanup: {e}")
+        finally:
+            # Destroy the window to exit
+            self.root.destroy()
 
 
 def main():
