@@ -93,9 +93,8 @@ class VPNGUI:
         self.server_listbox.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-        # Create context menu for right-click testing
+        # Create context menu for right-click actions
         self.context_menu = tk.Menu(self.root, tearoff=0, bg="#363636", fg="#e0e0e0")
-        self.context_menu.add_command(label="⚡ Test This Server", command=self.test_selected_server)
         self.context_menu.add_command(label="🔗 Connect to This Server", command=self.connect_selected_server)
 
         # Bind right-click to show context menu
@@ -116,12 +115,6 @@ class VPNGUI:
                                           relief="flat", bd=0, padx=20, pady=10,
                                           activebackground="#d32f2f", activeforeground="white")
         self.disconnect_button.pack(side="left", padx=(0, 10))
-
-        self.test_button = tk.Button(control_frame, text="⚡ Test All", command=self.test_all_servers,
-                                    bg="#2196F3", fg="white", font=("Segoe UI", 11, "bold"),
-                                    relief="flat", bd=0, padx=20, pady=10,
-                                    activebackground="#1976D2", activeforeground="white")
-        self.test_button.pack(side="left", padx=(0, 10))
 
         self.sort_button = tk.Button(control_frame, text="📊 Sort by Speed", command=self.sort_servers_by_latency,
                                     bg="#FF9800", fg="white", font=("Segoe UI", 11, "bold"),
@@ -174,6 +167,10 @@ class VPNGUI:
                 name = config.get('name', f"{config['protocol'].upper()}-{config['host']}:{config['port']}")
                 self.server_listbox.insert(tk.END, f"❓ {name}")
             self.status_label.config(text=f"📊 Status: Loaded {len(configs)} servers", foreground="#4CAF50")
+
+            # Automatically test all servers after loading
+            if configs:
+                self.root.after(500, self.test_all_servers)  # Small delay to show loading message first
 
         except Exception as e:
             self.status_label.config(text="❌ Status: Failed to load subscription", foreground="#f44336")
@@ -648,16 +645,7 @@ class VPNGUI:
         except:
             pass
 
-    def test_selected_server(self):
-        """Test the currently selected server"""
-        selection = self.server_listbox.curselection()
-        if not selection:
-            return
 
-        selected_index = selection[0]
-        if selected_index < len(self.current_configs):
-            config = self.current_configs[selected_index]
-            threading.Thread(target=self.test_single_server, args=(config, selected_index), daemon=True).start()
 
     def connect_selected_server(self):
         """Connect to the currently selected server"""
