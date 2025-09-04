@@ -19,13 +19,21 @@ def parse_ss_link(link):
         raise ValueError("Invalid SS format")
     encoded = encoded_part[:at_index]
     host_port = encoded_part[at_index + 1:]
-    # Decode base64
-    decoded = base64.b64decode(encoded).decode('utf-8')
+    # Decode base64 - handle padding issues
+    # Add padding if necessary
+    padding = len(encoded) % 4
+    if padding:
+        encoded += '=' * (4 - padding)
+    decoded = base64.urlsafe_b64decode(encoded).decode('utf-8')
     # Format: method:password
     if ':' not in decoded:
         raise ValueError("Invalid method:password")
     method, password = decoded.split(':', 1)
     # host:port
+    # Remove any query parameters (after ?) if present
+    if '?' in host_port:
+        host_port = host_port.split('?')[0]
+    
     if ':' not in host_port:
         raise ValueError("Invalid host:port")
     host, port_str = host_port.split(':', 1)
