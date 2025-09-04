@@ -7,6 +7,8 @@ import subprocess
 import threading
 import ctypes
 import winreg
+import socket
+import time
 from parsers import parse_link
 
 class VPNGUI:
@@ -91,6 +93,14 @@ class VPNGUI:
         self.server_listbox.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
+        # Create context menu for right-click testing
+        self.context_menu = tk.Menu(self.root, tearoff=0, bg="#363636", fg="#e0e0e0")
+        self.context_menu.add_command(label="⚡ Test This Server", command=self.test_selected_server)
+        self.context_menu.add_command(label="🔗 Connect to This Server", command=self.connect_selected_server)
+
+        # Bind right-click to show context menu
+        self.server_listbox.bind("<Button-3>", self.show_context_menu)
+
         # Control frame
         control_frame = ttk.Frame(server_frame)
         control_frame.pack(fill="x", pady=(15, 0))
@@ -99,13 +109,25 @@ class VPNGUI:
                                        bg="#4CAF50", fg="white", font=("Segoe UI", 11, "bold"),
                                        relief="flat", bd=0, padx=20, pady=10,
                                        activebackground="#45a049", activeforeground="white")
-        self.connect_button.pack(side="left", padx=(0, 15))
+        self.connect_button.pack(side="left", padx=(0, 10))
 
         self.disconnect_button = tk.Button(control_frame, text="❌ Disconnect", command=self.disconnect_vpn, state="disabled",
-                                          bg="#f44336", fg="#ffffff", font=("Segoe UI", 11, "bold"),
+                                          bg="#f44336", fg="white", font=("Segoe UI", 11, "bold"),
                                           relief="flat", bd=0, padx=20, pady=10,
-                                          activebackground="#d32f2f", activeforeground="#ffffff")
-        self.disconnect_button.pack(side="left", padx=(0, 30))
+                                          activebackground="#d32f2f", activeforeground="white")
+        self.disconnect_button.pack(side="left", padx=(0, 10))
+
+        self.test_button = tk.Button(control_frame, text="⚡ Test All", command=self.test_all_servers,
+                                    bg="#2196F3", fg="white", font=("Segoe UI", 11, "bold"),
+                                    relief="flat", bd=0, padx=20, pady=10,
+                                    activebackground="#1976D2", activeforeground="white")
+        self.test_button.pack(side="left", padx=(0, 10))
+
+        self.sort_button = tk.Button(control_frame, text="📊 Sort by Speed", command=self.sort_servers_by_latency,
+                                    bg="#FF9800", fg="white", font=("Segoe UI", 11, "bold"),
+                                    relief="flat", bd=0, padx=20, pady=10,
+                                    activebackground="#F57C00", activeforeground="white")
+        self.sort_button.pack(side="left", padx=(0, 10))
 
         self.system_proxy_var = tk.BooleanVar()
         self.system_proxy_check = ttk.Checkbutton(control_frame, text="🔧 Auto-set System Proxy", variable=self.system_proxy_var, command=self.update_system_proxy)
@@ -120,6 +142,7 @@ class VPNGUI:
 
         # Store configs
         self.current_configs = []
+        self.server_status = {}  # Store server status and latency
         self.v2ray_process = None
 
         # Auto-load subscription on startup
@@ -149,7 +172,7 @@ class VPNGUI:
             self.server_listbox.delete(0, tk.END)
             for i, config in enumerate(configs):
                 name = config.get('name', f"{config['protocol'].upper()}-{config['host']}:{config['port']}")
-                self.server_listbox.insert(tk.END, f"{i+1}. {name}")
+                self.server_listbox.insert(tk.END, f"❓ {name}")
             self.status_label.config(text=f"📊 Status: Loaded {len(configs)} servers", foreground="#4CAF50")
 
         except Exception as e:
@@ -505,3 +528,170 @@ class VPNGUI:
             self.set_system_proxy()
         else:
             self.unset_system_proxy()
+
+    def test_server_connectivity(self, host, port, timeout=5):
+        """Test basic TCP connectivity to server"""
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(timeout)
+            start_time = time.time()
+            result = sock.connect_ex((host, port))
+            end_time = time.time()
+            sock.close()
+
+            if result == 0:
+                latency = round((end_time - start_time) * 1000)  # Convert to ms
+                return True, latency
+            else:
+                return False, None
+        except Exception as e:
+            return False, None
+
+    def test_single_server(self, config, index):
+        """Test a single server and update its status"""
+        host = config['host']
+        port = int(config['port'])
+
+        self.status_label.config(text=f"⏳ Testing server: {host}:{port}...", foreground="#ff9800")
+
+        # Test connectivity
+        is_available, latency = self.test_server_connectivity(host, port)
+
+        # Store result
+        self.server_status[index] = {
+            'available': is_available,
+            'latency': latency,
+            'last_tested': time.time()
+        }
+
+        # Update display
+        self.update_server_list_display()
+
+    def test_all_servers(self):
+        """Test all servers for connectivity and latency"""
+        if not self.current_configs:
+            messagebox.showerror("❌ Error", "No servers to test")
+            return
+
+        self.status_label.config(text="⏳ Testing all servers...", foreground="#ff9800")
+
+        def test_worker():
+            total_servers = len(self.current_configs)
+            tested = 0
+
+            for i, config in enumerate(self.current_configs):
+                host = config['host']
+                port = int(config['port'])
+
+                # Update progress
+                self.status_label.config(text=f"⏳ Testing {tested+1}/{total_servers}: {host}:{port}...", foreground="#ff9800")
+
+                # Test server
+                is_available, latency = self.test_server_connectivity(host, port)
+
+                # Store result
+                self.server_status[i] = {
+                    'available': is_available,
+                    'latency': latency,
+                    'last_tested': time.time()
+                }
+
+                tested += 1
+
+            # Update final display
+            self.root.after(0, lambda: self.status_label.config(text=f"✅ Testing complete - {tested} servers tested", foreground="#4CAF50"))
+            self.root.after(0, self.update_server_list_display)
+
+        # Run tests in background thread
+        threading.Thread(target=test_worker, daemon=True).start()
+
+    def sort_servers_by_latency(self):
+        """Sort servers by latency (fastest first)"""
+        if not self.current_configs:
+            messagebox.showerror("❌ Error", "No servers to sort")
+            return
+
+        # Create list of (index, latency) tuples for sorting
+        server_latencies = []
+        for i, config in enumerate(self.current_configs):
+            status = self.server_status.get(i, {})
+            latency = status.get('latency', float('inf'))  # Use infinity for untested servers
+            available = status.get('available', False)
+            server_latencies.append((i, latency, available))
+
+        # Sort by availability first (available servers first), then by latency
+        server_latencies.sort(key=lambda x: (not x[2], x[1]))  # False (available) sorts before True (unavailable)
+
+        # Reorder configs and status based on sorted order
+        sorted_configs = []
+        sorted_status = {}
+
+        for new_index, (old_index, latency, available) in enumerate(server_latencies):
+            sorted_configs.append(self.current_configs[old_index])
+            if old_index in self.server_status:
+                sorted_status[new_index] = self.server_status[old_index]
+
+        # Update the lists
+        self.current_configs = sorted_configs
+        self.server_status = sorted_status
+
+        # Update display
+        self.update_server_list_display()
+        self.status_label.config(text="📊 Servers sorted by speed", foreground="#4CAF50")
+
+    def show_context_menu(self, event):
+        """Show context menu on right-click"""
+        try:
+            self.server_listbox.selection_clear(0, tk.END)
+            self.server_listbox.selection_set(self.server_listbox.nearest(event.y))
+            self.context_menu.post(event.x_root, event.y_root)
+        except:
+            pass
+
+    def test_selected_server(self):
+        """Test the currently selected server"""
+        selection = self.server_listbox.curselection()
+        if not selection:
+            return
+
+        selected_index = selection[0]
+        if selected_index < len(self.current_configs):
+            config = self.current_configs[selected_index]
+            threading.Thread(target=self.test_single_server, args=(config, selected_index), daemon=True).start()
+
+    def connect_selected_server(self):
+        """Connect to the currently selected server"""
+        selection = self.server_listbox.curselection()
+        if not selection:
+            return
+
+        selected_index = selection[0]
+        if selected_index < len(self.current_configs):
+            # Simulate selecting and connecting
+            self.server_listbox.selection_set(selected_index)
+            self.connect_vpn()
+
+    def update_server_list_display(self):
+        """Update the server listbox to show status and latency"""
+        self.server_listbox.delete(0, tk.END)
+
+        for i, config in enumerate(self.current_configs):
+            name = config.get('name', f"{config['protocol'].upper()}-{config['host']}:{config['port']}")
+
+            # Get status info
+            status_info = self.server_status.get(i, {})
+            available = status_info.get('available', None)
+            latency = status_info.get('latency', None)
+
+            # Format display text
+            if available is None:
+                status_text = f"❓ {name}"
+            elif available:
+                if latency is not None:
+                    status_text = f"🟢 {name} ({latency}ms)"
+                else:
+                    status_text = f"🟢 {name}"
+            else:
+                status_text = f"🔴 {name} (Offline)"
+
+            self.server_listbox.insert(tk.END, status_text)
