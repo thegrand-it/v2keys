@@ -54,8 +54,19 @@ class VPNGUI:
         style.configure("TLabelframe", background="#363636", foreground="#2196F3", font=("Segoe UI", 12, "bold"))
         style.configure("TLabelframe.Label", background="#363636", foreground="#2196F3", font=("Segoe UI", 12, "bold"))
 
-        # Listbox styling
-        style.configure("TListbox", background="#363636", foreground="#e0e0e0", font=("Segoe UI", 9))
+        # Treeview styling for table
+        style.configure("Treeview",
+                        background="#363636",
+                        foreground="#e0e0e0",
+                        fieldbackground="#363636",
+                        font=("Segoe UI", 9))
+        style.configure("Treeview.Heading",
+                        background="#2d2d2d",
+                        foreground="#2196F3",
+                        font=("Segoe UI", 10, "bold"))
+        style.map("Treeview",
+                  background=[("selected", "#2196F3")],
+                  foreground=[("selected", "white")])
 
         # Main container
         main_frame = ttk.Frame(root, padding="30")
@@ -82,15 +93,29 @@ class VPNGUI:
 
         ttk.Label(server_frame, text="📋 Available Servers:", font=("Segoe UI", 11)).pack(anchor="w", pady=(0, 10))
 
-        # Listbox with scrollbar
-        listbox_frame = ttk.Frame(server_frame)
-        listbox_frame.pack(fill="both", expand=True)
+        # Treeview table with scrollbar
+        table_frame = ttk.Frame(server_frame)
+        table_frame.pack(fill="both", expand=True)
 
-        self.server_listbox = tk.Listbox(listbox_frame, height=10, font=("Segoe UI", 9), selectbackground="#2196F3", selectforeground="white", bg="#363636", fg="#e0e0e0", relief="flat", bd=0)
-        scrollbar = ttk.Scrollbar(listbox_frame, orient="vertical", command=self.server_listbox.yview)
-        self.server_listbox.configure(yscrollcommand=scrollbar.set)
+        # Create Treeview with columns
+        columns = ("server", "status", "latency")
+        self.server_tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=12)
 
-        self.server_listbox.pack(side="left", fill="both", expand=True)
+        # Define column headings
+        self.server_tree.heading("server", text="Server Name")
+        self.server_tree.heading("status", text="Status")
+        self.server_tree.heading("latency", text="Latency")
+
+        # Define column widths
+        self.server_tree.column("server", width=300, minwidth=200)
+        self.server_tree.column("status", width=100, minwidth=80)
+        self.server_tree.column("latency", width=100, minwidth=80)
+
+        # Add scrollbar
+        scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.server_tree.yview)
+        self.server_tree.configure(yscrollcommand=scrollbar.set)
+
+        self.server_tree.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
         # Create context menu for right-click actions
@@ -98,7 +123,7 @@ class VPNGUI:
         self.context_menu.add_command(label="🔗 Connect to This Server", command=self.connect_selected_server)
 
         # Bind right-click to show context menu
-        self.server_listbox.bind("<Button-3>", self.show_context_menu)
+        self.server_tree.bind("<Button-3>", self.show_context_menu)
 
         # Control frame
         control_frame = ttk.Frame(server_frame)
@@ -161,11 +186,13 @@ class VPNGUI:
             # Store configs
             self.current_configs = configs
 
-            # Populate server list
-            self.server_listbox.delete(0, tk.END)
+            # Populate server table
+            for item in self.server_tree.get_children():
+                self.server_tree.delete(item)
+
             for i, config in enumerate(configs):
                 name = config.get('name', f"{config['protocol'].upper()}-{config['host']}:{config['port']}")
-                self.server_listbox.insert(tk.END, f"❓ {name}")
+                self.server_tree.insert("", "end", values=(name, "❓ Untested", "-"))
             self.status_label.config(text=f"📊 Status: Loaded {len(configs)} servers", foreground="#4CAF50")
 
             # Automatically test all servers after loading
@@ -323,12 +350,14 @@ class VPNGUI:
             messagebox.showerror("❌ Error", "No configs available")
             return
 
-        selection = self.server_listbox.curselection()
+        selection = self.server_tree.selection()
         if not selection:
             messagebox.showerror("❌ Error", "Please select a server")
             return
 
-        selected_index = selection[0]
+        # Get the selected item and its index
+        selected_item = selection[0]
+        selected_index = self.server_tree.index(selected_item)
         selected_config = self.current_configs[selected_index]
 
         # Generate config with only selected server
@@ -562,7 +591,7 @@ class VPNGUI:
         }
 
         # Update display
-        self.update_server_list_display()
+        self.root.after(0, self.update_server_list_display)
 
     def test_all_servers(self):
         """Test all servers for connectivity and latency"""
@@ -639,9 +668,11 @@ class VPNGUI:
     def show_context_menu(self, event):
         """Show context menu on right-click"""
         try:
-            self.server_listbox.selection_clear(0, tk.END)
-            self.server_listbox.selection_set(self.server_listbox.nearest(event.y))
-            self.context_menu.post(event.x_root, event.y_root)
+            # Get the item at the click position
+            item = self.server_tree.identify_row(event.y)
+            if item:
+                self.server_tree.selection_set(item)
+                self.context_menu.post(event.x_root, event.y_root)
         except:
             pass
 
@@ -649,19 +680,20 @@ class VPNGUI:
 
     def connect_selected_server(self):
         """Connect to the currently selected server"""
-        selection = self.server_listbox.curselection()
+        selection = self.server_tree.selection()
         if not selection:
             return
 
-        selected_index = selection[0]
+        selected_item = selection[0]
+        selected_index = self.server_tree.index(selected_item)
         if selected_index < len(self.current_configs):
-            # Simulate selecting and connecting
-            self.server_listbox.selection_set(selected_index)
             self.connect_vpn()
 
     def update_server_list_display(self):
-        """Update the server listbox to show status and latency"""
-        self.server_listbox.delete(0, tk.END)
+        """Update the server treeview to show status and latency"""
+        # Clear existing items
+        for item in self.server_tree.get_children():
+            self.server_tree.delete(item)
 
         for i, config in enumerate(self.current_configs):
             name = config.get('name', f"{config['protocol'].upper()}-{config['host']}:{config['port']}")
@@ -671,15 +703,15 @@ class VPNGUI:
             available = status_info.get('available', None)
             latency = status_info.get('latency', None)
 
-            # Format display text
+            # Format status and latency
             if available is None:
-                status_text = f"❓ {name}"
+                status_text = "❓ Untested"
+                latency_text = "-"
             elif available:
-                if latency is not None:
-                    status_text = f"🟢 {name} ({latency}ms)"
-                else:
-                    status_text = f"🟢 {name}"
+                status_text = "🟢 Online"
+                latency_text = f"{latency}ms" if latency is not None else "-"
             else:
-                status_text = f"🔴 {name} (Offline)"
+                status_text = "🔴 Offline"
+                latency_text = "-"
 
-            self.server_listbox.insert(tk.END, status_text)
+            self.server_tree.insert("", "end", values=(name, status_text, latency_text))
