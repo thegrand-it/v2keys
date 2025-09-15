@@ -1,3 +1,4 @@
-trojan://f282b878-8711-45a1-8c69-5564172123c1@world.stupx2.my.id:80/?type=ws&host=world.stupx2.my.id&path=%2FStupid-World%2F138.2.81.243-45319#SG%20-%20Oracle%20Corporation%20%5B%20TROJAN%20-%20NTLS%20%5D
+ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpmOGY3YUN6Y1BLYnNGOHAz@104.192.226.106:990#%F0%9F%87%BA%F0%9F%87%B8[openproxylist.com]%20ss-US
+ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpmOGY3YUN6Y1BLYnNGOHAz@185.213.23.226:990#%F0%9F%87%B3%F0%9F%87%B4[openproxylist.com]%20ss-NO
 ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTorR2p2TkFWM3R3VjRkOHl1QTBqcGVVelpPU3JBeU56YkYySWh6Rjhnak1NPQ@ger1.clonia.xyz:443?type=tcp#ger1-TheGrand(Yangon)
 ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpaSXJaQWJPRWFYY1UrOEV0d0RtVFU4SkZEK3BabEFGSENzTXpNK0FJWjJZPQ@ger1.clonia.xyz:443?type=tcp#ger1-TheGrand(Mandalay)
