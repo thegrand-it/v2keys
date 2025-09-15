@@ -1,3 +1,13 @@
+trojan://f282b878-8711-45a1-8c69-5564172123c1@world.stupx2.my.id:443?security=tls&sni=world.stupx2.my.id&type=ws&path=/Stupid-World/138.2.64.229-443&host=world.stupx2.my.id#SG%20-%20Oracle%20Cloud%20[%20TROJAN%20-%20TLS%20]
+trojan://f282b878-8711-45a1-8c69-5564172123c1@world.stupx2.my.id:443?security=tls&sni=world.stupx2.my.id&type=ws&path=/Stupid-World/138.2.69.236-23334&host=world.stupx2.my.id#SG%20-%20Oracle%20Cloud%20[%20TROJAN%20-%20TLS%20]
+trojan://f282b878-8711-45a1-8c69-5564172123c1@world.stupx2.my.id:443?security=tls&sni=world.stupx2.my.id&type=ws&path=/Stupid-World/138.2.69.236-23334&host=world.stupx2.my.id#SG%20-%20Oracle%20Corporation%20[%20TROJAN%20-%20TLS%20]
+trojan://f282b878-8711-45a1-8c69-5564172123c1@world.stupx2.my.id:443?security=tls&sni=world.stupx2.my.id&type=ws&path=/Stupid-World/138.2.81.243-45319&host=world.stupx2.my.id#SG%20-%20Oracle%20Cloud%20[%20TROJAN%20-%20TLS%20]
+trojan://f282b878-8711-45a1-8c69-5564172123c1@world.stupx2.my.id:443?security=tls&sni=world.stupx2.my.id&type=ws&path=/Stupid-World/138.2.89.64-32962&host=world.stupx2.my.id#SG%20-%20Oracle%20Cloud%20[%20TROJAN%20-%20TLS%20]
+trojan://f282b878-8711-45a1-8c69-5564172123c1@world.stupx2.my.id:443?security=tls&sni=world.stupx2.my.id&type=ws&path=/Stupid-World/138.2.89.64-32962&host=world.stupx2.my.id#SG%20-%20Oracle%20Corporation%20[%20TROJAN%20-%20TLS%20]
+trojan://f282b878-8711-45a1-8c69-5564172123c1@world.stupx2.my.id:443?security=tls&sni=world.stupx2.my.id&type=ws&path=/Stupid-World/138.2.95.33-17465&host=world.stupx2.my.id#SG%20-%20Oracle%20Cloud%20[%20TROJAN%20-%20TLS%20]
+trojan://f282b878-8711-45a1-8c69-5564172123c1@world.stupx2.my.id:443?security=tls&sni=world.stupx2.my.id&type=ws&path=/Stupid-World/138.2.95.61-1111&host=world.stupx2.my.id#SG%20-%20Oracle%20Cloud%20[%20TROJAN%20-%20TLS%20]
+trojan://f282b878-8711-45a1-8c69-5564172123c1@world.stupx2.my.id:443?security=tls&sni=world.stupx2.my.id&type=ws&path=/Stupid-World/138.75.209.209-80&host=world.stupx2.my.id#SG%20-%20M1%20LIMITED%20[%20TROJAN%20-%20TLS%20]
+
 ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpmOGY3YUN6Y1BLYnNGOHAz@104.192.226.106:990#%F0%9F%87%BA%F0%9F%87%B8[openproxylist.com]%20ss-US
 ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpmOGY3YUN6Y1BLYnNGOHAz@185.213.23.226:990#%F0%9F%87%B3%F0%9F%87%B4[openproxylist.com]%20ss-NO
 ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTorR2p2TkFWM3R3VjRkOHl1QTBqcGVVelpPU3JBeU56YkYySWh6Rjhnak1NPQ@ger1.clonia.xyz:443?type=tcp#ger1-TheGrand(Yangon)
